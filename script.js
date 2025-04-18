@@ -1,6 +1,25 @@
 // Carregar eventos do localStorage (se existirem)
 let eventos = JSON.parse(localStorage.getItem("eventos")) || [];
 
+// Se estiver vazio, adiciona eventos de exemplo com datas futuras
+if (eventos.length === 0) {
+  eventos = [
+    {
+      nome: "Feira de Artesanato",
+      data: "2025-04-25",
+      local: "Praça Central",
+      descricao: "Feira com produtos feitos à mão pelos artesãos locais.",
+    },
+    {
+      nome: "Apresentação Musical",
+      data: "2025-04-28",
+      local: "Centro Cultural",
+      descricao: "Show de bandas da cidade.",
+    }
+  ];
+  localStorage.setItem("eventos", JSON.stringify(eventos));
+}
+
 // Função para renderizar os eventos na página
 function renderEventos() {
   const listaEventos = document.getElementById("lista-eventos");
@@ -22,11 +41,11 @@ function renderEventos() {
 // Função para adicionar novo evento
 function adicionarEvento(evento) {
   eventos.push(evento);
-  localStorage.setItem("eventos", JSON.stringify(eventos)); // Salvar eventos no localStorage
+  localStorage.setItem("eventos", JSON.stringify(eventos)); // Salvar no localStorage
   renderEventos();
 }
 
-// Manipulador de evento do formulário
+// Manipulador de envio do formulário
 document.getElementById("evento-form").addEventListener("submit", function(event) {
   event.preventDefault();
 
@@ -35,40 +54,26 @@ document.getElementById("evento-form").addEventListener("submit", function(event
   const local = document.getElementById("local").value;
   const descricao = document.getElementById("descricao").value;
 
-  const novoEvento = {
-    nome,
-    data,
-    local,
-    descricao,
-  };
-
+  const novoEvento = { nome, data, local, descricao };
   adicionarEvento(novoEvento);
-
-  // Limpar formulário após envio
-  this.reset();
+  this.reset(); // Limpa o formulário
 });
 
-// Inicializa os eventos na página
-renderEventos();
-
+// Função para remover eventos com data anterior a hoje
 function removerEventosAntigos() {
   const hoje = new Date();
-  hoje.setHours(0, 0, 0, 0); // Ignora hora
+  hoje.setHours(0, 0, 0, 0); // Zera hora para comparar datas
 
-  // Filtrar apenas eventos que ainda vão acontecer
   eventos = eventos.filter(evento => {
     const dataEvento = new Date(evento.data);
     return dataEvento >= hoje;
   });
 
-  // Atualiza o localStorage
-  localStorage.setItem("eventos", JSON.stringify(eventos));
-
-  // Re-renderiza os eventos
-  renderEventos();
+  localStorage.setItem("eventos", JSON.stringify(eventos)); // Atualiza storage
 }
 
-// Executa a função ao carregar a página
+// Quando a página carregar
 window.onload = function () {
-  removerEventosAntigos(); // já chama renderEventos() por dentro
+  removerEventosAntigos();
+  renderEventos();
 };
