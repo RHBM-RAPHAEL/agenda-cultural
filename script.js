@@ -50,3 +50,24 @@ document.getElementById("evento-form").addEventListener("submit", function(event
 
 // Inicializa os eventos na página
 renderEventos();
+
+// Função para remover eventos com data anterior a hoje
+function removerEventosAntigos() {
+  const eventos = document.querySelectorAll('.evento');
+  const hoje = new Date();
+  hoje.setHours(0, 0, 0, 0); // Zera hora para comparar apenas a data
+
+  eventos.forEach(evento => {
+    const dataStr = evento.getAttribute('data-data');
+    const dataEvento = new Date(dataStr);
+
+    if (dataEvento < hoje) {
+      evento.remove(); // Remove o evento da tela
+    }
+  });
+}
+
+// Executa a função ao carregar a página
+window.onload = function () {
+  removerEventosAntigos();
+};
