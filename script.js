@@ -114,3 +114,32 @@ function adicionarEvento(evento) {
     console.error("Erro ao adicionar evento: ", error);
   });
 }
+function renderEventos() {
+  const listaEventos = document.getElementById("lista-eventos");
+  listaEventos.innerHTML = ""; // Limpar a lista antes de adicionar os novos eventos
+
+  // Buscar eventos do Firestore
+  db.collection("eventos")
+    .get()
+    .then((querySnapshot) => {
+      querySnapshot.forEach((doc) => {
+        const evento = doc.data();
+        const dataEvento = new Date(evento.data);
+
+        // Criar o conteúdo do evento
+        const divEvento = document.createElement("div");
+        divEvento.classList.add("evento");
+
+        divEvento.innerHTML = `
+          <h3>${evento.nome}</h3>
+          <p><strong>Data:</strong> ${dataEvento.toLocaleString()}</p>
+          <p><strong>Local:</strong> ${evento.local}</p>
+          <p>${evento.descricao}</p>
+        `;
+        listaEventos.appendChild(divEvento);
+      });
+    })
+    .catch((error) => {
+      console.error("Erro ao buscar eventos: ", error);
+    });
+}
