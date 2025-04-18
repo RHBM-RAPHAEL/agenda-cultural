@@ -38,10 +38,10 @@
     <p>Projeto acadêmico - 2025</p>
   </footer>
 
+  <!-- Carregando Firebase SDK -->
   <script type="module">
     // Importando as funções necessárias do SDK
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
-    import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-analytics.js";
     import { getFirestore } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
     
     // Configuração do Firebase
@@ -49,7 +49,7 @@
       apiKey: "AIzaSyDHGwiT-bxFTKSa1LUJ6c0icxg1Ss_kyOY",
       authDomain: "agenda-ccb-c82a6.firebaseapp.com",
       projectId: "agenda-ccb-c82a6",
-      storageBucket: "agenda-ccb-c82a6.appspot.com", // Corrigido
+      storageBucket: "agenda-ccb-c82a6.appspot.com",
       messagingSenderId: "126594979891",
       appId: "1:126594979891:web:a20398cf3b66abe6c52b46",
       measurementId: "G-GSYZRK4MHD"
@@ -57,12 +57,12 @@
 
     // Inicializando o Firebase
     const app = initializeApp(firebaseConfig);
-    const analytics = getAnalytics(app);
 
     // Inicializando o Firestore
     const db = getFirestore(app);
   </script>
 
+  <!-- Carregando o script que manipula os eventos -->
   <script src="script.js"></script>
 </body>
 </html>
