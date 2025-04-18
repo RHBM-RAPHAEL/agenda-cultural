@@ -6,6 +6,16 @@ function renderEventos() {
   const listaEventos = document.getElementById("lista-eventos");
   listaEventos.innerHTML = ""; // Limpar lista antes de adicionar
 
+  // Remover eventos antigos
+  eventos = eventos.filter(evento => {
+    const dataEvento = new Date(evento.data);
+    return dataEvento > new Date(); // Filtra apenas os eventos futuros
+  });
+
+  // Atualizar o localStorage com eventos futuros
+  localStorage.setItem("eventos", JSON.stringify(eventos));
+
+  // Renderizar os eventos
   eventos.forEach(evento => {
     const divEvento = document.createElement("div");
     divEvento.classList.add("evento");
@@ -16,7 +26,7 @@ function renderEventos() {
 
     divEvento.innerHTML = `
       <h3>${evento.nome}</h3>
-      <p><strong>Data e Hora:</strong> ${formatarDataHora(dataEvento)}</p>
+      <p><strong>Data:</strong> ${formatarDataHora(dataEvento)}</p>
       <p><strong>Local:</strong> ${evento.local}</p>
       <p>${evento.descricao}</p>
       <p><strong>Faltam:</strong> ${tempoRestante}</p>
