@@ -1,11 +1,12 @@
 // Configuração do Firebase
 const firebaseConfig = {
-  apiKey: "SUA_API_KEY",
-  authDomain: "SEU_AUTH_DOMAIN",
-  projectId: "SEU_PROJECT_ID",
-  storageBucket: "SEU_STORAGE_BUCKET",
-  messagingSenderId: "SEU_MESSAGING_SENDER_ID",
-  appId: "SEU_APP_ID"
+  apiKey: "AIzaSyDHGwiT-bxFTKSa1LUJ6c0icxg1Ss_kyOY",
+  authDomain: "agenda-ccb-c82a6.firebaseapp.com",
+  projectId: "agenda-ccb-c82a6",
+  storageBucket: "agenda-ccb-c82a6.firebasestorage.app",
+  messagingSenderId: "126594979891",
+  appId: "1:126594979891:web:2c5451282d55b91dc52b46",
+  measurementId: "G-1091ND1DJ2"
 };
 
 // Inicializar Firebase
