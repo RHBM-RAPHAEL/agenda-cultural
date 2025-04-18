@@ -1,78 +1,85 @@
-// Carregar eventos do localStorage (se existirem)
 let eventos = JSON.parse(localStorage.getItem("eventos")) || [];
 
-// Se estiver vazio, adiciona eventos de exemplo com datas futuras
-if (eventos.length === 0) {
-  eventos = [
-    {
-      nome: "Feira de Artesanato",
-      data: "2025-04-25",
-      local: "Praça Central",
-      descricao: "Feira com produtos feitos à mão pelos artesãos locais.",
-    },
-    {
-      nome: "Apresentação Musical",
-      data: "2025-04-28",
-      local: "Centro Cultural",
-      descricao: "Show de bandas da cidade.",
-    }
-  ];
+function salvarEventos() {
   localStorage.setItem("eventos", JSON.stringify(eventos));
 }
 
-// Função para renderizar os eventos na página
 function renderEventos() {
   const listaEventos = document.getElementById("lista-eventos");
-  listaEventos.innerHTML = ""; // Limpar lista antes de adicionar
+  listaEventos.innerHTML = "";
 
-  eventos.forEach(evento => {
+  const agora = new Date();
+
+  eventos.forEach((evento, index) => {
+    const dataCompleta = new Date(`${evento.data}T${evento.hora}`);
+    if (dataCompleta <= agora) return; // Já passou
+
     const divEvento = document.createElement("div");
     divEvento.classList.add("evento");
+
+    const tempoRestante = document.createElement("p");
+    tempoRestante.classList.add("contador");
+
+    function atualizarContagem() {
+      const agora = new Date();
+      const diferenca = dataCompleta - agora;
+
+      if (diferenca <= 0) {
+        eventos.splice(index, 1); // Remove da lista
+        salvarEventos();
+        renderEventos(); // Re-renderiza
+        return;
+      }
+
+      const dias = Math.floor(diferenca / (1000 * 60 * 60 * 24));
+      const horas = Math.floor((diferenca / (1000 * 60 * 60)) % 24);
+      const minutos = Math.floor((diferenca / (1000 * 60)) % 60);
+      const segundos = Math.floor((diferenca / 1000) % 60);
+
+      tempoRestante.textContent = `Faltam ${dias}d ${horas}h ${minutos}min ${segundos}s`;
+    }
+
+    atualizarContagem();
+    setInterval(atualizarContagem, 1000); // Atualiza a cada segundo
+
     divEvento.innerHTML = `
       <h3>${evento.nome}</h3>
       <p><strong>Data:</strong> ${evento.data}</p>
+      <p><strong>Hora:</strong> ${evento.hora}</p>
       <p><strong>Local:</strong> ${evento.local}</p>
       <p>${evento.descricao}</p>
     `;
+    divEvento.appendChild(tempoRestante);
     listaEventos.appendChild(divEvento);
   });
 }
 
-// Função para adicionar novo evento
 function adicionarEvento(evento) {
   eventos.push(evento);
-  localStorage.setItem("eventos", JSON.stringify(eventos)); // Salvar no localStorage
+  salvarEventos();
   renderEventos();
 }
 
-// Manipulador de envio do formulário
-document.getElementById("evento-form").addEventListener("submit", function(event) {
+document.getElementById("evento-form").addEventListener("submit", function (event) {
   event.preventDefault();
 
   const nome = document.getElementById("nome").value;
   const data = document.getElementById("data").value;
+  const hora = document.getElementById("hora").value;
   const local = document.getElementById("local").value;
   const descricao = document.getElementById("descricao").value;
 
-  const novoEvento = { nome, data, local, descricao };
+  const novoEvento = { nome, data, hora, local, descricao };
   adicionarEvento(novoEvento);
-  this.reset(); // Limpa o formulário
+  this.reset();
 });
 
-// Função para remover eventos com data anterior a hoje
 function removerEventosAntigos() {
-  const hoje = new Date();
-  hoje.setHours(0, 0, 0, 0); // Zera hora para comparar datas
-
-  eventos = eventos.filter(evento => {
-    const dataEvento = new Date(evento.data);
-    return dataEvento >= hoje;
-  });
-
-  localStorage.setItem("eventos", JSON.stringify(eventos)); // Atualiza storage
+  const agora = new Date();
+  eventos = eventos.filter(e => new Date(`${e.data}T${e.hora}`) > agora);
+  salvarEventos();
 }
 
-// Quando a página carregar
 window.onload = function () {
   removerEventosAntigos();
   renderEventos();
