@@ -1,32 +1,34 @@
 // Carregar eventos do localStorage (se existirem)
 let eventos = JSON.parse(localStorage.getItem("eventos")) || [];
 
+// Função para remover eventos passados
+function removerEventosPassados() {
+  const agora = new Date();
+  // Filtra os eventos, mantendo apenas os futuros
+  eventos = eventos.filter(evento => new Date(evento.data) > agora);
+  // Atualiza o localStorage com os eventos futuros
+  localStorage.setItem("eventos", JSON.stringify(eventos));
+}
+
 // Função para renderizar os eventos na página
 function renderEventos() {
   const listaEventos = document.getElementById("lista-eventos");
   listaEventos.innerHTML = ""; // Limpar lista antes de adicionar
 
-  // Remover eventos antigos
-  eventos = eventos.filter(evento => {
-    const dataEvento = new Date(evento.data);
-    return dataEvento > new Date(); // Filtra apenas os eventos futuros
-  });
+  // Chama a função para remover eventos passados antes de renderizar
+  removerEventosPassados();
 
-  // Atualizar o localStorage com eventos futuros
-  localStorage.setItem("eventos", JSON.stringify(eventos));
-
-  // Renderizar os eventos
+  // Renderiza os eventos
   eventos.forEach(evento => {
     const divEvento = document.createElement("div");
     divEvento.classList.add("evento");
-    const dataEvento = new Date(evento.data);
 
-    // Criando o conteúdo do evento com o tempo restante
+    const dataEvento = new Date(evento.data);
     const tempoRestante = calcularTempoRestante(dataEvento);
 
     divEvento.innerHTML = `
       <h3>${evento.nome}</h3>
-      <p><strong>Data:</strong> ${formatarDataHora(dataEvento)}</p>
+      <p><strong>Data e Hora:</strong> ${formatarDataHora(dataEvento)}</p>
       <p><strong>Local:</strong> ${evento.local}</p>
       <p>${evento.descricao}</p>
       <p><strong>Faltam:</strong> ${tempoRestante}</p>
