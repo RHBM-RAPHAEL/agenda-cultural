@@ -1,13 +1,20 @@
-// Carregar eventos do localStorage (se existirem)
-let eventos = JSON.parse(localStorage.getItem("eventos")) || [];
-
 // Função para remover eventos passados
 function removerEventosPassados() {
   const agora = new Date();
   // Filtra os eventos, mantendo apenas os futuros
   eventos = eventos.filter(evento => new Date(evento.data) > agora);
-  // Atualiza o localStorage com os eventos futuros
-  localStorage.setItem("eventos", JSON.stringify(eventos));
+  // Atualiza o Firestore com os eventos futuros
+  db.collection("eventos").get().then((querySnapshot) => {
+    querySnapshot.forEach((doc) => {
+      const evento = doc.data();
+      const dataEvento = new Date(evento.data);
+      if (dataEvento <= agora) {
+        db.collection("eventos").doc(doc.id).delete(); // Remove evento passado
+      }
+    });
+  }).catch((error) => {
+    console.error("Erro ao remover eventos passados: ", error);
+  });
 }
 
 // Função para renderizar os eventos na página
@@ -18,23 +25,32 @@ function renderEventos() {
   // Chama a função para remover eventos passados antes de renderizar
   removerEventosPassados();
 
-  // Renderiza os eventos
-  eventos.forEach(evento => {
-    const divEvento = document.createElement("div");
-    divEvento.classList.add("evento");
+  // Buscar eventos do Firestore
+  db.collection("eventos")
+    .get()
+    .then((querySnapshot) => {
+      querySnapshot.forEach((doc) => {
+        const evento = doc.data();
+        const dataEvento = new Date(evento.data);
+        const tempoRestante = calcularTempoRestante(dataEvento);
 
-    const dataEvento = new Date(evento.data);
-    const tempoRestante = calcularTempoRestante(dataEvento);
+        // Criar o conteúdo do evento
+        const divEvento = document.createElement("div");
+        divEvento.classList.add("evento");
 
-    divEvento.innerHTML = `
-      <h3>${evento.nome}</h3>
-      <p><strong>Data e Hora:</strong> ${formatarDataHora(dataEvento)}</p>
-      <p><strong>Local:</strong> ${evento.local}</p>
-      <p>${evento.descricao}</p>
-      <p><strong>Faltam:</strong> ${tempoRestante}</p>
-    `;
-    listaEventos.appendChild(divEvento);
-  });
+        divEvento.innerHTML = `
+          <h3>${evento.nome}</h3>
+          <p><strong>Data e Hora:</strong> ${formatarDataHora(dataEvento)}</p>
+          <p><strong>Local:</strong> ${evento.local}</p>
+          <p>${evento.descricao}</p>
+          <p><strong>Faltam:</strong> ${tempoRestante}</p>
+        `;
+        listaEventos.appendChild(divEvento);
+      });
+    })
+    .catch((error) => {
+      console.error("Erro ao buscar eventos: ", error);
+    });
 }
 
 // Função para calcular o tempo restante
@@ -66,9 +82,20 @@ function formatarDataHora(data) {
 
 // Função para adicionar novo evento
 function adicionarEvento(evento) {
-  eventos.push(evento);
-  localStorage.setItem("eventos", JSON.stringify(eventos)); // Salvar eventos no localStorage
-  renderEventos();
+  // Adicionando evento no Firestore
+  db.collection("eventos").add({
+    nome: evento.nome,
+    data: evento.data,
+    local: evento.local,
+    descricao: evento.descricao,
+  })
+  .then(() => {
+    console.log("Evento adicionado com sucesso!");
+    renderEventos(); // Atualiza a lista de eventos
+  })
+  .catch((error) => {
+    console.error("Erro ao adicionar evento: ", error);
+  });
 }
 
 // Manipulador de evento do formulário
@@ -98,48 +125,3 @@ renderEventos();
 
 // Função para atualizar o tempo real a cada 60 segundos
 setInterval(renderEventos, 60000);
-function adicionarEvento(evento) {
-  // Adicionando evento no Firestore
-  db.collection("eventos").add({
-    nome: evento.nome,
-    data: evento.data,
-    local: evento.local,
-    descricao: evento.descricao,
-  })
-  .then(() => {
-    console.log("Evento adicionado com sucesso!");
-    renderEventos(); // Atualiza a lista de eventos
-  })
-  .catch((error) => {
-    console.error("Erro ao adicionar evento: ", error);
-  });
-}
-function renderEventos() {
-  const listaEventos = document.getElementById("lista-eventos");
-  listaEventos.innerHTML = ""; // Limpar a lista antes de adicionar os novos eventos
-
-  // Buscar eventos do Firestore
-  db.collection("eventos")
-    .get()
-    .then((querySnapshot) => {
-      querySnapshot.forEach((doc) => {
-        const evento = doc.data();
-        const dataEvento = new Date(evento.data);
-
-        // Criar o conteúdo do evento
-        const divEvento = document.createElement("div");
-        divEvento.classList.add("evento");
-
-        divEvento.innerHTML = `
-          <h3>${evento.nome}</h3>
-          <p><strong>Data:</strong> ${dataEvento.toLocaleString()}</p>
-          <p><strong>Local:</strong> ${evento.local}</p>
-          <p>${evento.descricao}</p>
-        `;
-        listaEventos.appendChild(divEvento);
-      });
-    })
-    .catch((error) => {
-      console.error("Erro ao buscar eventos: ", error);
-    });
-}
