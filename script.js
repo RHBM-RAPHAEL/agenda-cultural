@@ -1,142 +1,76 @@
-// Importando as funções necessárias do Firebase SDK
+// Importando os módulos do Firebase via ES Modules
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
 import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
 
 // Configuração do Firebase
 const firebaseConfig = {
-  apiKey: "SUA_API_KEY",
-  authDomain: "SEU_AUTH_DOMAIN",
-  projectId: "SEU_PROJECT_ID",
-  storageBucket: "SEU_STORAGE_BUCKET",
-  messagingSenderId: "SEU_MESSAGING_SENDER_ID",
-  appId: "SEU_APP_ID",
-  measurementId: "SEU_MEASUREMENT_ID"
+  apiKey: "AIzaSyDHGwiT-bxFTKSa1LUJ6c0icxg1Ss_kyOY",
+  authDomain: "agenda-ccb-c82a6.firebaseapp.com",
+  projectId: "agenda-ccb-c82a6",
+  storageBucket: "agenda-ccb-c82a6.appspot.com",
+  messagingSenderId: "126594979891",
+  appId: "1:126594979891:web:a20398cf3b66abe6c52b46",
+  measurementId: "G-GSYZRK4MHD"
 };
 
-// Inicializando o Firebase
+// Inicializando Firebase e Firestore
 const app = initializeApp(firebaseConfig);
-
-// Inicializando o Firestore
 const db = getFirestore(app);
 
-// Função para remover eventos passados
-function removerEventosPassados(eventos) {
-  const agora = new Date();
-  return eventos.filter(evento => new Date(evento.data) > agora);
-}
+// Referência ao formulário e lista de eventos
+const eventoForm = document.getElementById("evento-form");
+const listaEventos = document.getElementById("lista-eventos");
 
-// Função para renderizar os eventos na página
-function renderEventos(eventos) {
-  const listaEventos = document.getElementById("lista-eventos");
-  listaEventos.innerHTML = ""; // Limpar a lista antes de adicionar novos eventos
+// Função para carregar eventos do Firestore
+async function carregarEventos() {
+  listaEventos.innerHTML = ""; // Limpa antes de carregar
 
-  const eventosFuturos = removerEventosPassados(eventos); // Filtra os eventos futuros
+  const querySnapshot = await getDocs(collection(db, "eventos"));
+  querySnapshot.forEach((doc) => {
+    const evento = doc.data();
 
-  eventosFuturos.forEach(evento => {
-    const divEvento = document.createElement("div");
-    divEvento.classList.add("evento");
+    const div = document.createElement("div");
+    div.className = "evento";
 
-    const dataEvento = new Date(evento.data);
-    const tempoRestante = calcularTempoRestante(dataEvento);
-
-    divEvento.innerHTML = `
+    div.innerHTML = `
       <h3>${evento.nome}</h3>
-      <p><strong>Data e Hora:</strong> ${formatarDataHora(dataEvento)}</p>
+      <p><strong>Data:</strong> ${new Date(evento.data).toLocaleString()}</p>
       <p><strong>Local:</strong> ${evento.local}</p>
       <p>${evento.descricao}</p>
-      <p><strong>Faltam:</strong> ${tempoRestante}</p>
+      <hr>
     `;
-    listaEventos.appendChild(divEvento);
+
+    listaEventos.appendChild(div);
   });
 }
 
-// Função para calcular o tempo restante
-function calcularTempoRestante(dataEvento) {
-  const agora = new Date();
-  const tempo = dataEvento - agora;
-
-  if (tempo <= 0) {
-    return "Evento já passou!";
-  }
-
-  const dias = Math.floor(tempo / (1000 * 60 * 60 * 24));
-  const horas = Math.floor((tempo % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-  const minutos = Math.floor((tempo % (1000 * 60 * 60)) / (1000 * 60));
-
-  return `${dias} dias, ${horas} horas e ${minutos} minutos`;
-}
-
-// Função para formatar a data e hora para exibição
-function formatarDataHora(data) {
-  const dia = data.getDate().toString().padStart(2, '0');
-  const mes = (data.getMonth() + 1).toString().padStart(2, '0');
-  const ano = data.getFullYear();
-  const hora = data.getHours().toString().padStart(2, '0');
-  const minuto = data.getMinutes().toString().padStart(2, '0');
-
-  return `${dia}/${mes}/${ano} ${hora}:${minuto}`;
-}
-
-// Função para adicionar novo evento no Firestore
-async function adicionarEvento(evento) {
-  try {
-    // Adicionar evento no Firestore
-    await addDoc(collection(db, "eventos"), {
-      nome: evento.nome,
-      data: evento.data,
-      local: evento.local,
-      descricao: evento.descricao,
-    });
-
-    console.log("Evento adicionado com sucesso!");
-    renderEventos(await buscarEventos()); // Atualiza a lista de eventos
-  } catch (e) {
-    console.error("Erro ao adicionar evento: ", e);
-  }
-}
-
-// Função para buscar eventos do Firestore
-async function buscarEventos() {
-  const querySnapshot = await getDocs(collection(db, "eventos"));
-  const eventos = [];
-  querySnapshot.forEach((doc) => {
-    eventos.push(doc.data());
-  });
-
-  return eventos;
-}
-
-// Manipulador de evento do formulário
-document.getElementById("evento-form").addEventListener("submit", function(event) {
-  event.preventDefault();
+// Quando o formulário for enviado, salva no Firebase
+eventoForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
 
   const nome = document.getElementById("nome").value;
   const data = document.getElementById("data").value;
   const local = document.getElementById("local").value;
   const descricao = document.getElementById("descricao").value;
 
-  const novoEvento = {
-    nome,
-    data,
-    local,
-    descricao,
-  };
+  try {
+    await addDoc(collection(db, "eventos"), {
+      nome,
+      data,
+      local,
+      descricao
+    });
 
-  adicionarEvento(novoEvento);
-  this.reset();
+    // Limpa os campos
+    eventoForm.reset();
+
+    // Recarrega os eventos atualizados
+    carregarEventos();
+
+  } catch (error) {
+    console.error("Erro ao adicionar evento: ", error);
+  }
 });
 
-// Inicializa os eventos na página
-async function inicializarEventos() {
-  const eventos = await buscarEventos();
-  renderEventos(eventos);
-}
-
-// Chama a função para inicializar os eventos
-inicializarEventos();
-
-// Função para atualizar o tempo real a cada 60 segundos
-setInterval(async () => {
-  const eventos = await buscarEventos();
-  renderEventos(eventos);
-}, 60000);
+// Carrega eventos ao abrir a página
+carregarEventos();
