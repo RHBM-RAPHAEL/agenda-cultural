@@ -16,7 +16,7 @@ function renderEventos() {
 
     divEvento.innerHTML = `
       <h3>${evento.nome}</h3>
-      <p><strong>Data:</strong> ${evento.data}</p>
+      <p><strong>Data e Hora:</strong> ${formatarDataHora(dataEvento)}</p>
       <p><strong>Local:</strong> ${evento.local}</p>
       <p>${evento.descricao}</p>
       <p><strong>Faltam:</strong> ${tempoRestante}</p>
@@ -39,6 +39,17 @@ function calcularTempoRestante(dataEvento) {
   const minutos = Math.floor((tempo % (1000 * 60 * 60)) / (1000 * 60));
 
   return `${dias} dias, ${horas} horas e ${minutos} minutos`;
+}
+
+// Função para formatar a data e hora para exibição
+function formatarDataHora(data) {
+  const dia = data.getDate().toString().padStart(2, '0');
+  const mes = (data.getMonth() + 1).toString().padStart(2, '0');
+  const ano = data.getFullYear();
+  const hora = data.getHours().toString().padStart(2, '0');
+  const minuto = data.getMinutes().toString().padStart(2, '0');
+
+  return `${dia}/${mes}/${ano} ${hora}:${minuto}`;
 }
 
 // Função para adicionar novo evento
