@@ -1,17 +1,23 @@
+// Importando as funções necessárias do SDK do Firebase
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+
 // Configuração do Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyDHGwiT-bxFTKSa1LUJ6c0icxg1Ss_kyOY",
   authDomain: "agenda-ccb-c82a6.firebaseapp.com",
   projectId: "agenda-ccb-c82a6",
-  storageBucket: "agenda-ccb-c82a6.firebasestorage.app",
+  storageBucket: "agenda-ccb-c82a6.appspot.com",
   messagingSenderId: "126594979891",
-  appId: "1:126594979891:web:2c5451282d55b91dc52b46",
-  measurementId: "G-1091ND1DJ2"
+  appId: "1:126594979891:web:a20398cf3b66abe6c52b46",
+  measurementId: "G-GSYZRK4MHD"
 };
 
-// Inicializar Firebase
-const app = firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();  // Inicializar Firestore
+// Inicializando o Firebase
+const app = initializeApp(firebaseConfig);
+
+// Inicializando o Firestore
+const db = getFirestore(app);
 
 // Carregar eventos do localStorage (se existirem)
 let eventos = JSON.parse(localStorage.getItem("eventos")) || [];
@@ -85,25 +91,25 @@ function formatarDataHora(data) {
 }
 
 // Função para adicionar novo evento
-function adicionarEvento(evento) {
-  // Adicionar evento no Firestore
-  db.collection("eventos").add({
-    nome: evento.nome,
-    data: evento.data,
-    local: evento.local,
-    descricao: evento.descricao,
-  })
-  .then(() => {
+async function adicionarEvento(evento) {
+  try {
+    // Adicionar evento no Firestore
+    await addDoc(collection(db, "eventos"), {
+      nome: evento.nome,
+      data: evento.data,
+      local: evento.local,
+      descricao: evento.descricao,
+    });
     console.log("Evento adicionado com sucesso!");
-    renderEventos(); // Atualiza a lista de eventos
-  })
-  .catch((error) => {
-    console.error("Erro ao adicionar evento: ", error);
-  });
 
-  // Adicionar evento também no localStorage
-  eventos.push(evento);
-  localStorage.setItem("eventos", JSON.stringify(eventos));
+    // Adicionar evento também no localStorage
+    eventos.push(evento);
+    localStorage.setItem("eventos", JSON.stringify(eventos));
+
+    renderEventos(); // Atualiza a lista de eventos na página
+  } catch (error) {
+    console.error("Erro ao adicionar evento: ", error);
+  }
 }
 
 // Manipulador de evento do formulário
