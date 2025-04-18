@@ -98,3 +98,19 @@ renderEventos();
 
 // Função para atualizar o tempo real a cada 60 segundos
 setInterval(renderEventos, 60000);
+function adicionarEvento(evento) {
+  // Adicionando evento no Firestore
+  db.collection("eventos").add({
+    nome: evento.nome,
+    data: evento.data,
+    local: evento.local,
+    descricao: evento.descricao,
+  })
+  .then(() => {
+    console.log("Evento adicionado com sucesso!");
+    renderEventos(); // Atualiza a lista de eventos
+  })
+  .catch((error) => {
+    console.error("Erro ao adicionar evento: ", error);
+  });
+}
