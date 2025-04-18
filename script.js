@@ -15,17 +15,20 @@ const db = firebase.firestore();  // Inicializar Firestore
 // Carregar eventos do localStorage (se existirem)
 let eventos = JSON.parse(localStorage.getItem("eventos")) || [];
 
+// Garantir que 'eventos' seja sempre um array
+if (!Array.isArray(eventos)) {
+  eventos = [];
+}
+
 // Função para remover eventos passados
 function removerEventosPassados() {
   const agora = new Date();
 
   // Verifica se 'eventos' é um array antes de filtrar
-  if (Array.isArray(eventos)) {
-    eventos = eventos.filter(evento => new Date(evento.data) > agora);
-    localStorage.setItem("eventos", JSON.stringify(eventos));  // Atualiza o localStorage
-  } else {
-    eventos = [];  // Se não for um array, redefina eventos como um array vazio
-  }
+  eventos = eventos.filter(evento => new Date(evento.data) > agora);
+
+  // Atualiza o localStorage com os eventos futuros
+  localStorage.setItem("eventos", JSON.stringify(eventos));
 }
 
 // Função para renderizar os eventos na página
