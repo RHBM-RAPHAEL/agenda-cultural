@@ -1,16 +1,16 @@
-// Importando as funções necessárias do SDK do Firebase
+// Importando as funções necessárias do Firebase SDK
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
-import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
 
 // Configuração do Firebase
 const firebaseConfig = {
-  apiKey: "AIzaSyDHGwiT-bxFTKSa1LUJ6c0icxg1Ss_kyOY",
-  authDomain: "agenda-ccb-c82a6.firebaseapp.com",
-  projectId: "agenda-ccb-c82a6",
-  storageBucket: "agenda-ccb-c82a6.appspot.com",
-  messagingSenderId: "126594979891",
-  appId: "1:126594979891:web:a20398cf3b66abe6c52b46",
-  measurementId: "G-GSYZRK4MHD"
+  apiKey: "SUA_API_KEY",
+  authDomain: "SEU_AUTH_DOMAIN",
+  projectId: "SEU_PROJECT_ID",
+  storageBucket: "SEU_STORAGE_BUCKET",
+  messagingSenderId: "SEU_MESSAGING_SENDER_ID",
+  appId: "SEU_APP_ID",
+  measurementId: "SEU_MEASUREMENT_ID"
 };
 
 // Inicializando o Firebase
@@ -19,33 +19,20 @@ const app = initializeApp(firebaseConfig);
 // Inicializando o Firestore
 const db = getFirestore(app);
 
-// Carregar eventos do localStorage (se existirem)
-let eventos = JSON.parse(localStorage.getItem("eventos")) || [];
-
-// Garantir que 'eventos' seja sempre um array
-if (!Array.isArray(eventos)) {
-  eventos = [];
-}
-
 // Função para remover eventos passados
-function removerEventosPassados() {
+function removerEventosPassados(eventos) {
   const agora = new Date();
-
-  // Verifica se 'eventos' é um array antes de filtrar
-  eventos = eventos.filter(evento => new Date(evento.data) > agora);
-
-  // Atualiza o localStorage com os eventos futuros
-  localStorage.setItem("eventos", JSON.stringify(eventos));
+  return eventos.filter(evento => new Date(evento.data) > agora);
 }
 
 // Função para renderizar os eventos na página
-function renderEventos() {
+function renderEventos(eventos) {
   const listaEventos = document.getElementById("lista-eventos");
   listaEventos.innerHTML = ""; // Limpar a lista antes de adicionar novos eventos
 
-  removerEventosPassados(); // Remove eventos passados
+  const eventosFuturos = removerEventosPassados(eventos); // Filtra os eventos futuros
 
-  eventos.forEach(evento => {
+  eventosFuturos.forEach(evento => {
     const divEvento = document.createElement("div");
     divEvento.classList.add("evento");
 
@@ -90,7 +77,7 @@ function formatarDataHora(data) {
   return `${dia}/${mes}/${ano} ${hora}:${minuto}`;
 }
 
-// Função para adicionar novo evento
+// Função para adicionar novo evento no Firestore
 async function adicionarEvento(evento) {
   try {
     // Adicionar evento no Firestore
@@ -100,16 +87,23 @@ async function adicionarEvento(evento) {
       local: evento.local,
       descricao: evento.descricao,
     });
+
     console.log("Evento adicionado com sucesso!");
-
-    // Adicionar evento também no localStorage
-    eventos.push(evento);
-    localStorage.setItem("eventos", JSON.stringify(eventos));
-
-    renderEventos(); // Atualiza a lista de eventos na página
-  } catch (error) {
-    console.error("Erro ao adicionar evento: ", error);
+    renderEventos(await buscarEventos()); // Atualiza a lista de eventos
+  } catch (e) {
+    console.error("Erro ao adicionar evento: ", e);
   }
+}
+
+// Função para buscar eventos do Firestore
+async function buscarEventos() {
+  const querySnapshot = await getDocs(collection(db, "eventos"));
+  const eventos = [];
+  querySnapshot.forEach((doc) => {
+    eventos.push(doc.data());
+  });
+
+  return eventos;
 }
 
 // Manipulador de evento do formulário
@@ -133,7 +127,16 @@ document.getElementById("evento-form").addEventListener("submit", function(event
 });
 
 // Inicializa os eventos na página
-renderEventos();
+async function inicializarEventos() {
+  const eventos = await buscarEventos();
+  renderEventos(eventos);
+}
+
+// Chama a função para inicializar os eventos
+inicializarEventos();
 
 // Função para atualizar o tempo real a cada 60 segundos
-setInterval(renderEventos, 60000);
+setInterval(async () => {
+  const eventos = await buscarEventos();
+  renderEventos(eventos);
+}, 60000);
