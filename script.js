@@ -1,86 +1,77 @@
+// Carregar eventos do localStorage (se existirem)
 let eventos = JSON.parse(localStorage.getItem("eventos")) || [];
 
-function salvarEventos() {
-  localStorage.setItem("eventos", JSON.stringify(eventos));
-}
-
+// Função para renderizar os eventos na página
 function renderEventos() {
   const listaEventos = document.getElementById("lista-eventos");
-  listaEventos.innerHTML = "";
+  listaEventos.innerHTML = ""; // Limpar lista antes de adicionar
 
-  const agora = new Date();
-
-  eventos.forEach((evento, index) => {
-    const dataCompleta = new Date(`${evento.data}T${evento.hora}`);
-    if (dataCompleta <= agora) return; // Já passou
-
+  eventos.forEach(evento => {
     const divEvento = document.createElement("div");
     divEvento.classList.add("evento");
+    const dataEvento = new Date(evento.data);
 
-    const tempoRestante = document.createElement("p");
-    tempoRestante.classList.add("contador");
-
-    function atualizarContagem() {
-      const agora = new Date();
-      const diferenca = dataCompleta - agora;
-
-      if (diferenca <= 0) {
-        eventos.splice(index, 1); // Remove da lista
-        salvarEventos();
-        renderEventos(); // Re-renderiza
-        return;
-      }
-
-      const dias = Math.floor(diferenca / (1000 * 60 * 60 * 24));
-      const horas = Math.floor((diferenca / (1000 * 60 * 60)) % 24);
-      const minutos = Math.floor((diferenca / (1000 * 60)) % 60);
-      const segundos = Math.floor((diferenca / 1000) % 60);
-
-      tempoRestante.textContent = `Faltam ${dias}d ${horas}h ${minutos}min ${segundos}s`;
-    }
-
-    atualizarContagem();
-    setInterval(atualizarContagem, 1000); // Atualiza a cada segundo
+    // Criando o conteúdo do evento com o tempo restante
+    const tempoRestante = calcularTempoRestante(dataEvento);
 
     divEvento.innerHTML = `
       <h3>${evento.nome}</h3>
       <p><strong>Data:</strong> ${evento.data}</p>
-      <p><strong>Hora:</strong> ${evento.hora}</p>
       <p><strong>Local:</strong> ${evento.local}</p>
       <p>${evento.descricao}</p>
+      <p><strong>Faltam:</strong> ${tempoRestante}</p>
     `;
-    divEvento.appendChild(tempoRestante);
     listaEventos.appendChild(divEvento);
   });
 }
 
+// Função para calcular o tempo restante
+function calcularTempoRestante(dataEvento) {
+  const agora = new Date();
+  const tempo = dataEvento - agora;
+
+  if (tempo <= 0) {
+    return "Evento já passou!";
+  }
+
+  const dias = Math.floor(tempo / (1000 * 60 * 60 * 24));
+  const horas = Math.floor((tempo % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  const minutos = Math.floor((tempo % (1000 * 60 * 60)) / (1000 * 60));
+
+  return `${dias} dias, ${horas} horas e ${minutos} minutos`;
+}
+
+// Função para adicionar novo evento
 function adicionarEvento(evento) {
   eventos.push(evento);
-  salvarEventos();
+  localStorage.setItem("eventos", JSON.stringify(eventos)); // Salvar eventos no localStorage
   renderEventos();
 }
 
-document.getElementById("evento-form").addEventListener("submit", function (event) {
+// Manipulador de evento do formulário
+document.getElementById("evento-form").addEventListener("submit", function(event) {
   event.preventDefault();
 
   const nome = document.getElementById("nome").value;
   const data = document.getElementById("data").value;
-  const hora = document.getElementById("hora").value;
   const local = document.getElementById("local").value;
   const descricao = document.getElementById("descricao").value;
 
-  const novoEvento = { nome, data, hora, local, descricao };
+  const novoEvento = {
+    nome,
+    data,
+    local,
+    descricao,
+  };
+
   adicionarEvento(novoEvento);
+
+  // Limpar formulário após envio
   this.reset();
 });
 
-function removerEventosAntigos() {
-  const agora = new Date();
-  eventos = eventos.filter(e => new Date(`${e.data}T${e.hora}`) > agora);
-  salvarEventos();
-}
+// Inicializa os eventos na página
+renderEventos();
 
-window.onload = function () {
-  removerEventosAntigos();
-  renderEventos();
-};
+// Função para atualizar o tempo real a cada 60 segundos
+setInterval(renderEventos, 60000);
