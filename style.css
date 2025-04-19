@@ -71,7 +71,7 @@ footer {
 }
 
 #mostrar-eventos-btn {
-  background-color: #ff1900;
+  background-color: #ff8800;
   color: white;
   border: none;
   padding: 10px 15px;
@@ -82,5 +82,5 @@ footer {
 }
 
 #mostrar-eventos-btn:hover {
-  background-color: #ff5722;  /* Altere a cor do fundo no hover para um tom laranja mais claro */
+  background-color: #ff8800;  /* Altere a cor do fundo no hover para um tom laranja mais claro */
 }
