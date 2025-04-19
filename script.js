@@ -8,15 +8,14 @@ import {
   doc
 } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
 
-// Configuração Firebase
+// Config Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyDHGwiT-bxFTKSa1LUJ6c0icxg1Ss_kyOY",
   authDomain: "agenda-ccb-c82a6.firebaseapp.com",
   projectId: "agenda-ccb-c82a6",
   storageBucket: "agenda-ccb-c82a6.appspot.com",
   messagingSenderId: "126594979891",
-  appId: "1:126594979891:web:a20398cf3b66abe6c52b46",
-  measurementId: "G-GSYZRK4MHD"
+  appId: "1:126594979891:web:a20398cf3b66abe6c52b46"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -27,48 +26,37 @@ const listaEventos = document.getElementById("lista-eventos");
 
 async function carregarEventos() {
   listaEventos.innerHTML = "";
-
   const querySnapshot = await getDocs(collection(db, "eventos"));
+
   const agora = new Date();
 
-  for (const docSnap of querySnapshot.docs) {
-    const evento = docSnap.data();
-    const id = docSnap.id;
-    const dataEvento = new Date(evento.data);
+  querySnapshot.forEach(async (documento) => {
+    const evento = documento.data();
+    const eventoData = new Date(evento.data);
 
-    // Se o evento já passou, apaga do Firebase
-    if (dataEvento < agora) {
-      await deleteDoc(doc(db, "eventos", id));
-      continue; // Pula para o próximo evento
+    // Deleta eventos passados
+    if (eventoData < agora) {
+      await deleteDoc(doc(db, "eventos", documento.id));
+      return;
     }
 
-    // Se o evento ainda não passou, exibe na tela
+    // Mostra eventos futuros
     const div = document.createElement("div");
     div.className = "evento";
 
     div.innerHTML = `
       <h3>${evento.nome}</h3>
-      <p><strong>Data:</strong> ${dataEvento.toLocaleString()}</p>
+      <p><strong>Data:</strong> ${eventoData.toLocaleString()}</p>
       <p><strong>Local:</strong> ${evento.local}</p>
       <p>${evento.descricao}</p>
-      <button class="excluir-btn" data-id="${id}">Excluir</button>
-      <hr>
+      <button class="excluir-btn" data-id="${documento.id}">Excluir</button>
     `;
 
     listaEventos.appendChild(div);
-  }
-
-  // Adiciona ação para botões de exclusão manual
-  const botoesExcluir = document.querySelectorAll(".excluir-btn");
-  botoesExcluir.forEach((btn) => {
-    btn.addEventListener("click", async () => {
-      const id = btn.getAttribute("data-id");
-      await deleteDoc(doc(db, "eventos", id));
-      carregarEventos(); // Atualiza após excluir
-    });
   });
 }
 
+// Adicionar evento
 eventoForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -89,6 +77,20 @@ eventoForm.addEventListener("submit", async (e) => {
     carregarEventos();
   } catch (error) {
     console.error("Erro ao adicionar evento: ", error);
+  }
+});
+
+// Exclusão manual
+listaEventos.addEventListener("click", async (e) => {
+  if (e.target.classList.contains("excluir-btn")) {
+    const id = e.target.getAttribute("data-id");
+
+    try {
+      await deleteDoc(doc(db, "eventos", id));
+      carregarEventos();
+    } catch (error) {
+      console.error("Erro ao excluir evento: ", error);
+    }
   }
 });
 
