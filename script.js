@@ -50,7 +50,7 @@ async function carregarEventos() {
       <p><strong>Data:</strong> ${eventoData.toLocaleString()}</p>
       <p><strong>Local:</strong> ${evento.local}</p>
       <p>${evento.descricao}</p>
-      <button class="excluir-btn" data-id="${documento.id}">Excluir</button>
+      <button class="btn-excluir" data-id="${documento.id}">Excluir</button>
     `;
 
     listaEventos.appendChild(div);
@@ -85,7 +85,7 @@ eventoForm.addEventListener("submit", async (e) => {
 
 // Exclusão manual
 listaEventos.addEventListener("click", async (e) => {
-  if (e.target.classList.contains("excluir-btn")) {
+  if (e.target.classList.contains("btn-excluir")) {
     const id = e.target.getAttribute("data-id");
 
     try {
