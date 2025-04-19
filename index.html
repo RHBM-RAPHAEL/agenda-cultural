@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Agenda CCB</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header>
     <h1>Agenda CCB</h1>
-    <p>Eventos da Congregação Cristã no Brasil</p>
+    <p>Divulgação de eventos da Congregação Cristã no Brasil</p>
   </header>
 
   <main>
@@ -20,20 +20,35 @@
     </section>
 
     <section id="formulario">
-      <h2>Adicionar Novo Evento</h2>
+      <h2>Sugerir Novo Evento</h2>
       <form id="evento-form">
-        <input type="text" id="nome" placeholder="Nome do Evento" required />
-        <input type="datetime-local" id="data" required />
-        <input type="text" id="local" placeholder="Local" required />
+        <input type="text" id="nome" placeholder="Nome do Evento" required>
+        <input type="datetime-local" id="data" required>
+        <input type="text" id="local" placeholder="Local do Evento" required>
         <textarea id="descricao" placeholder="Descrição" required></textarea>
-        <button type="submit">Salvar Evento</button>
+        <input type="password" id="senha" placeholder="Senha para editar/excluir" required>
+        <button type="submit">Adicionar Evento</button>
+      </form>
+    </section>
+
+    <section id="editar-form" style="display: none;">
+      <h2>Editar Evento</h2>
+      <form id="editar-evento-form">
+        <input type="text" id="editar-nome" placeholder="Nome do Evento" required>
+        <input type="datetime-local" id="editar-data" required>
+        <input type="text" id="editar-local" placeholder="Local do Evento" required>
+        <textarea id="editar-descricao" placeholder="Descrição" required></textarea>
+        <input type="password" id="editar-senha" placeholder="Senha para editar/excluir" required>
+        <button type="submit">Salvar Alterações</button>
       </form>
     </section>
   </main>
 
   <footer>
     <p>&copy; 2025 Agenda CCB | Raphael Henrique</p>
-    <p><strong>Projeto acadêmico</strong> desenvolvido no curso de Engenharia de Software.</p>
+    <p><strong>Agenda CCB</strong> é um projeto desenvolvido como atividade extensionista do curso de Engenharia de Software.</p>
+    <p>Esta página foi criada com HTML, CSS e JavaScript.</p>
+    <p>Projeto acadêmico - 2025</p>
   </footer>
 
   <script type="module" src="script.js"></script>
