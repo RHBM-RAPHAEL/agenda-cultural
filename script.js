@@ -81,7 +81,7 @@ eventoForm.addEventListener("submit", async (e) => {
   try {
     await addDoc(collection(db, "eventos"), {
       nome,
-      data,
+      data: new Date(data),
       local,
       descricao
     });
