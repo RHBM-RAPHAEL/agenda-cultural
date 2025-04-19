@@ -1,6 +1,13 @@
 // Importando os módulos do Firebase via ES Modules
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  getDocs,
+  deleteDoc,
+  doc
+} from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
 
 // Configuração do Firebase
 const firebaseConfig = {
@@ -21,9 +28,27 @@ const db = getFirestore(app);
 const eventoForm = document.getElementById("evento-form");
 const listaEventos = document.getElementById("lista-eventos");
 
+// 🧽 Nova função para excluir eventos vencidos do Firestore
+async function excluirEventosPassados() {
+  const agora = new Date();
+  const querySnapshot = await getDocs(collection(db, "eventos"));
+
+  querySnapshot.forEach(async (documento) => {
+    const dados = documento.data();
+    const dataEvento = new Date(dados.data);
+
+    if (dataEvento <= agora) {
+      await deleteDoc(doc(db, "eventos", documento.id));
+      console.log(`Evento "${dados.nome}" excluído (prazo expirado).`);
+    }
+  });
+}
+
 // Função para carregar eventos do Firestore
 async function carregarEventos() {
   listaEventos.innerHTML = ""; // Limpa antes de carregar
+
+  await excluirEventosPassados(); // Exclui eventos vencidos antes de carregar
 
   const querySnapshot = await getDocs(collection(db, "eventos"));
   querySnapshot.forEach((doc) => {
@@ -61,11 +86,8 @@ eventoForm.addEventListener("submit", async (e) => {
       descricao
     });
 
-    // Limpa os campos
-    eventoForm.reset();
-
-    // Recarrega os eventos atualizados
-    carregarEventos();
+    eventoForm.reset(); // Limpa os campos
+    carregarEventos(); // Recarrega os eventos atualizados
 
   } catch (error) {
     console.error("Erro ao adicionar evento: ", error);
