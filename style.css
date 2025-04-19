@@ -69,3 +69,16 @@ footer {
   margin-top: 2rem;
   font-size: 0.9rem;
 }
+#mostrar-eventos-btn {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  margin-bottom: 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+#mostrar-eventos-btn:hover {
+  background-color: #45a049;
+}
