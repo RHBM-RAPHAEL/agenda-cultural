@@ -1,45 +1,178 @@
-body {
-  font-family: Arial, sans-serif;
+/* Resetando margens e paddings para uma base limpa */
+* {
   margin: 0;
   padding: 0;
-  background: #fdfdfd;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Corpo do site */
+body {
+  background: #f4f7fc;
   color: #333;
+  line-height: 1.6;
+  font-size: 16px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
-header, footer {
-  background-color: #f2f2f2;
-  padding: 20px;
+/* Cabeçalho */
+header {
+  background: #4c8bf5; /* Azul vibrante */
+  color: #fff;
   text-align: center;
-}
-
-main {
   padding: 20px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-#formulario, #eventos {
+header h1 {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+}
+
+header p {
+  font-size: 1.2rem;
+  font-weight: 300;
+}
+
+/* Main Content */
+main {
+  flex: 1;
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+section {
   margin-bottom: 30px;
 }
 
-form input, form textarea, form button {
-  display: block;
-  width: 100%;
-  margin: 10px 0;
-  padding: 10px;
+/* Estilo dos títulos das seções */
+h2 {
+  font-size: 1.8rem;
+  color: #333;
+  margin-bottom: 20px;
+  font-weight: 500;
 }
 
-.evento {
-  border: 1px solid #ccc;
-  padding: 15px;
-  margin-bottom: 15px;
+/* Formulário */
+#formulario form {
   background: #fff;
-  border-radius: 8px;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
-button.excluir-btn {
-  background-color: #ff6666;
-  border: none;
+#formulario input,
+#formulario textarea {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+/* Efeito de foco no input e textarea */
+#formulario input:focus,
+#formulario textarea:focus {
+  border-color: #4c8bf5;
+  box-shadow: 0 0 5px rgba(76, 139, 245, 0.6);
+  outline: none;
+}
+
+/* Botão */
+#formulario button {
+  background-color: #4c8bf5;
   color: white;
-  padding: 8px;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+#formulario button:hover {
+  background-color: #3578e5;
+}
+
+/* Estilo dos eventos */
+#eventos .evento {
+  background: #fff;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease;
+}
+
+#eventos .evento:hover {
+  transform: scale(1.02);
+}
+
+.evento h3 {
+  font-size: 1.5rem;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.evento p {
+  color: #666;
+}
+
+.evento button {
+  background-color: #ff6666;
+  color: white;
+  border: none;
+  padding: 8px 12px;
   border-radius: 5px;
   cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.evento button:hover {
+  background-color: #ff4d4d;
+}
+
+/* Rodapé */
+footer {
+  background: #f2f2f2;
+  padding: 20px;
+  text-align: center;
+  font-size: 0.9rem;
+  color: #666;
+  border-top: 2px solid #ddd;
+}
+
+footer p {
+  margin: 10px 0;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  main {
+    padding: 15px;
+  }
+
+  header h1 {
+    font-size: 2rem;
+  }
+
+  header p {
+    font-size: 1rem;
+  }
+
+  #formulario input,
+  #formulario textarea,
+  #formulario button {
+    font-size: 0.9rem;
+  }
+
+  .evento h3 {
+    font-size: 1.3rem;
+  }
 }
