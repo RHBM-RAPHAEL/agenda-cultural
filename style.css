@@ -38,9 +38,8 @@ input, textarea {
   font-size: 1rem;
 }
 
+/* Botão Padrão (usado para estilos gerais, se necessário) */
 button {
-  background-color: #ff0000;
-  color: white;
   padding: 0.7rem 1.5rem;
   border: none;
   border-radius: 6px;
@@ -49,8 +48,39 @@ button {
   transition: background-color 0.3s;
 }
 
-button:hover {
-  background-color: #303f9f;
+/* Botão Mostrar Eventos (laranja) */
+#mostrar-eventos-btn {
+  background-color: #ff9800;
+  color: white;
+  padding: 10px 15px;
+  margin-bottom: 15px;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+#mostrar-eventos-btn:hover {
+  background-color: #fb8c00;
+}
+
+/* Botão Salvar (verde) */
+.btn-salvar {
+  background-color: #28a745;
+  color: white;
+}
+
+.btn-salvar:hover {
+  background-color: #218838;
+}
+
+/* Botão Excluir (vermelho) */
+.btn-excluir {
+  background-color: #dc3545;
+  color: white;
+  margin-left: 10px;
+}
+
+.btn-excluir:hover {
+  background-color: #c82333;
 }
 
 .evento {
@@ -68,19 +98,4 @@ footer {
   text-align: center;
   margin-top: 2rem;
   font-size: 0.9rem;
-}
-
-#mostrar-eventos-btn {
-  background-color: #3949ab; /* Cor inicial laranja */
-  color: white;
-  border: none;
-  padding: 10px 15px;
-  margin-bottom: 15px;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 16px;
-}
-
-#mostrar-eventos-btn:hover {
-  background-color: #00ff59; /* Cor do botão em laranja mais claro no hover */
 }
