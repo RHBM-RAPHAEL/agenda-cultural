@@ -1,19 +1,42 @@
-body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #f7f7f7;
-  margin: 0;
-  padding: 0;
-  color: #333;
+/* Variáveis de Cores */
+:root {
+  --cor-primaria: #3a00ff;
+  --cor-secundaria: #ff9800;
+  --cor-hover-secundaria: #e68900;
+  --cor-fundo: #f7f7f7;
+  --cor-texto: #333;
+  --cor-botao-salvar: #3949ab;
+  --cor-botao-salvar-hover: #303f9f;
+  --cor-botao-excluir: #e53935;
+  --cor-botao-excluir-hover: #c62828;
+  --cor-footer: #1a237e;
 }
 
+/* Reset e base */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--cor-fundo);
+  margin: 0;
+  padding: 0;
+  color: var(--cor-texto);
+}
+
+/* Cabeçalho */
 header {
-  background-color: #3a00ff;
+  background-color: var(--cor-primaria);
   color: white;
   padding: 2rem;
   text-align: center;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
+/* Conteúdo principal */
 main {
   max-width: 800px;
   margin: 2rem auto;
@@ -23,12 +46,14 @@ main {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
+/* Títulos */
 h2 {
-  color: #1a237e;
+  color: var(--cor-botao-salvar);
   border-bottom: 2px solid #c5cae9;
   padding-bottom: 0.5rem;
 }
 
+/* Inputs e Textareas */
 input, textarea {
   width: 100%;
   padding: 0.8rem;
@@ -36,71 +61,72 @@ input, textarea {
   border: 1px solid #ccc;
   border-radius: 6px;
   font-size: 1rem;
+  transition: border-color 0.3s;
+}
+input:focus,
+textarea:focus {
+  border-color: var(--cor-secundaria);
+  outline: none;
 }
 
-/* Botão: Mostrar Eventos */
-#mostrar-eventos-btn {
-  background-color: #ff9800;
-  color: white;
-  border: none;
-  padding: 10px 15px;
-  margin-bottom: 15px;
-  border-radius: 5px;
+/* Botões */
+button {
   cursor: pointer;
-  font-size: 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: bold;
+  transition: background-color 0.3s, transform 0.2s;
 }
-#mostrar-eventos-btn:hover {
-  background-color: #e68900;
+button:focus {
+  outline: 2px solid var(--cor-secundaria);
 }
 
-/* Botão: Salvar Evento */
-.btn-salvar {
-  background-color: #3949ab;
+/* Mostrar Eventos */
+#mostrar-eventos-btn {
+  background-color: var(--cor-secundaria);
   color: white;
   padding: 0.7rem 1.5rem;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: background-color 0.3s;
+  margin-bottom: 15px;
 }
-.btn-salvar:hover {
-  background-color: #303f9f;
+#mostrar-eventos-btn:hover {
+  background-color: var(--cor-hover-secundaria);
 }
 
-/* Botão: Excluir Evento */
-.btn-excluir {
-  background-color: #e53935;
+/* Salvar Evento */
+.btn-salvar {
+  background-color: var(--cor-botao-salvar);
   color: white;
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: background-color 0.3s;
+  padding: 0.7rem 1.5rem;
+}
+.btn-salvar:hover {
+  background-color: var(--cor-botao-salvar-hover);
+}
+
+/* Excluir Evento */
+.btn-excluir {
+  background-color: var(--cor-botao-excluir);
+  color: white;
+  padding: 0.7rem 1.5rem;
   margin-right: 10px;
 }
 .btn-excluir:hover {
-  background-color: #c62828;
+  background-color: var(--cor-botao-excluir-hover);
 }
 
-/* Botão: Editar Evento */
+/* Editar Evento */
 .btn-editar {
-  background-color: #ff9800;
+  background-color: var(--cor-secundaria);
   color: white;
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: background-color 0.3s;
+  padding: 0.7rem 1.5rem;
 }
 .btn-editar:hover {
-  background-color: #e68900;
+  background-color: var(--cor-hover-secundaria);
 }
 
+/* Bloco de Evento */
 .evento {
-  border-left: 4px solid #3949ab;
+  border-left: 4px solid var(--cor-botao-salvar);
   background: #f1f1f1;
   margin-bottom: 1.5rem;
   padding: 1rem;
@@ -108,22 +134,15 @@ input, textarea {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
 }
 
+/* Rodapé */
 footer {
-  background-color: #1a237e;
+  background-color: var(--cor-footer);
   color: white;
   padding: 1rem;
   text-align: center;
   margin-top: 2rem;
   font-size: 0.9rem;
-}
-.btn-salvar:focus,
-.btn-excluir:focus,
-.btn-editar:focus {
-  outline: 2px solid #ff9800;
-}
-
-input:focus, textarea:focus {
-  border-color: #ff9800;
 }
