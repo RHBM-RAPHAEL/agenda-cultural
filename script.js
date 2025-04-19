@@ -101,3 +101,20 @@ listaEventos.addEventListener("click", async (e) => {
 });
 // Carregar eventos ao inicializar a página
 carregarEventos();
+const mostrarEventosBtn = document.getElementById("mostrar-eventos-btn");
+const listaEventosDiv = document.getElementById("lista-eventos");
+
+mostrarEventosBtn.addEventListener("click", async () => {
+  // Se já estiver visível, oculta
+  if (listaEventosDiv.style.display === "block") {
+    listaEventosDiv.style.display = "none";
+    mostrarEventosBtn.textContent = "Mostrar Eventos";
+  } else {
+    listaEventosDiv.style.display = "block";
+    mostrarEventosBtn.textContent = "Ocultar Eventos";
+    // Carrega os eventos só quando mostrar
+    if (listaEventosDiv.innerHTML.trim() === "") {
+      await carregarEventos();
+    }
+  }
+});
