@@ -69,6 +69,7 @@ footer {
   margin-top: 2rem;
   font-size: 0.9rem;
 }
+
 #mostrar-eventos-btn {
   background-color: #ff1900;
   color: white;
@@ -79,6 +80,7 @@ footer {
   cursor: pointer;
   font-size: 16px;
 }
+
 #mostrar-eventos-btn:hover {
-  background-color: #ff1900;
+  background-color: #ff5722;  /* Altere a cor do fundo no hover para um tom laranja mais claro */
 }
