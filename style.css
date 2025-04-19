@@ -43,4 +43,6 @@ button.excluir-btn {
   border-radius: 5px;
   cursor: pointer;
 }
- 
+button.excluir-btn:hover {
+  background-color: #ff4d4d;
+}
