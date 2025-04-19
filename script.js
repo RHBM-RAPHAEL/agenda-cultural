@@ -6,7 +6,8 @@ import {
   getDocs,
   deleteDoc,
   doc,
-  updateDoc
+  updateDoc,
+  getDoc
 } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
 
 // Configuração do Firebase
@@ -140,6 +141,9 @@ listaEventos.addEventListener("click", async (e) => {
     document.getElementById("local").value = evento.local;
     document.getElementById("descricao").value = evento.descricao;
     eventoIdEdicao = id;  // Armazena o ID do evento que está sendo editado
+
+    // Mudando o título do botão para "Editar evento"
+    document.getElementById("evento-form").querySelector("button").textContent = "Editar Evento";
   }
 });
 
