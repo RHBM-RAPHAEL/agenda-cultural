@@ -25,10 +25,7 @@ const db = getFirestore(app);
 const eventoForm = document.getElementById("evento-form");
 const listaEventos = document.getElementById("lista-eventos");
 const mostrarEventosBtn = document.getElementById("mostrar-eventos-btn");
-const editarEventoForm = document.getElementById("editar-evento-form");
-const editarFormSection = document.getElementById("editar-form");
-
-let eventoEditandoId = null; // Para controlar qual evento está sendo editado
+let eventoIdEdicao = null;  // Variável para armazenar o ID do evento sendo editado
 
 // Função para carregar eventos
 async function carregarEventos() {
@@ -55,8 +52,8 @@ async function carregarEventos() {
       <p><strong>Data:</strong> ${eventoData.toLocaleString()}</p>
       <p><strong>Local:</strong> ${evento.local}</p>
       <p>${evento.descricao}</p>
-      <button class="excluir-btn" data-id="${documento.id}">Excluir</button>
-      <button class="editar-btn" data-id="${documento.id}">Editar</button>
+      <button class="btn-editar" data-id="${documento.id}">Editar</button>
+      <button class="btn-excluir" data-id="${documento.id}">Excluir</button>
     `;
 
     listaEventos.appendChild(div);
@@ -73,98 +70,76 @@ eventoForm.addEventListener("submit", async (e) => {
   const descricao = document.getElementById("descricao").value;
   const senha = document.getElementById("senha").value;
 
+  if (!senha || senha !== "1234") {  // A senha para criar/editar evento
+    alert("Senha incorreta!");
+    return;
+  }
+
   try {
-    await addDoc(collection(db, "eventos"), {
-      nome,
-      data,
-      local,
-      descricao,
-      senha
-    });
+    if (eventoIdEdicao) {
+      // Atualizar evento
+      const eventoRef = doc(db, "eventos", eventoIdEdicao);
+      await updateDoc(eventoRef, {
+        nome,
+        data,
+        local,
+        descricao
+      });
+      eventoIdEdicao = null; // Limpa a variável após edição
+    } else {
+      // Criar novo evento
+      await addDoc(collection(db, "eventos"), {
+        nome,
+        data,
+        local,
+        descricao
+      });
+    }
 
     eventoForm.reset();
     await carregarEventos();
     listaEventos.style.display = "block";
     mostrarEventosBtn.textContent = "Ocultar Eventos";
   } catch (error) {
-    console.error("Erro ao adicionar evento: ", error);
+    console.error("Erro ao adicionar ou editar evento: ", error);
   }
 });
 
 // Exclusão manual
 listaEventos.addEventListener("click", async (e) => {
-  if (e.target.classList.contains("excluir-btn")) {
+  if (e.target.classList.contains("btn-excluir")) {
     const id = e.target.getAttribute("data-id");
-    const senha = prompt("Digite a senha para excluir:");
+    const senha = prompt("Digite a senha para excluir o evento:");
 
-    const eventoDoc = doc(db, "eventos", id);
-    const evento = (await getDocs(eventoDoc)).data();
-
-    if (evento.senha === senha) {
-      try {
-        await deleteDoc(eventoDoc);
-        const eventoDiv = e.target.closest(".evento");
-        eventoDiv.remove();
-      } catch (error) {
-        console.error("Erro ao excluir evento: ", error);
-      }
-    } else {
+    if (!senha || senha !== "1234") {  // Verifica se a senha é correta
       alert("Senha incorreta!");
+      return;
+    }
+
+    try {
+      await deleteDoc(doc(db, "eventos", id));
+      const eventoDiv = e.target.closest(".evento");
+      eventoDiv.remove();
+    } catch (error) {
+      console.error("Erro ao excluir evento: ", error);
     }
   }
 });
 
 // Editar evento
 listaEventos.addEventListener("click", async (e) => {
-  if (e.target.classList.contains("editar-btn")) {
-    eventoEditandoId = e.target.getAttribute("data-id");
+  if (e.target.classList.contains("btn-editar")) {
+    const id = e.target.getAttribute("data-id");
+    const eventoRef = doc(db, "eventos", id);
+    const eventoDoc = await getDoc(eventoRef);
+    const evento = eventoDoc.data();
 
-    // Carregar dados do evento para edição
-    const eventoDoc = doc(db, "eventos", eventoEditandoId);
-    const evento = (await getDocs(eventoDoc)).data();
-
-    // Preencher campos do formulário de edição
-    document.getElementById("editar-nome").value = evento.nome;
-    document.getElementById("editar-data").value = evento.data;
-    document.getElementById("editar-local").value = evento.local;
-    document.getElementById("editar-descricao").value = evento.descricao;
-
-    editarFormSection.style.display = "block";
-  }
-});
-
-// Salvar alterações de evento
-editarEventoForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
-
-  const nome = document.getElementById("editar-nome").value;
-  const data = document.getElementById("editar-data").value;
-  const local = document.getElementById("editar-local").value;
-  const descricao = document.getElementById("editar-descricao").value;
-  const senha = document.getElementById("editar-senha").value;
-
-  const eventoDoc = doc(db, "eventos", eventoEditandoId);
-  const evento = (await getDocs(eventoDoc)).data();
-
-  // Verifica a senha antes de editar
-  if (evento.senha === senha) {
-    try {
-      await updateDoc(eventoDoc, {
-        nome,
-        data,
-        local,
-        descricao
-      });
-
-      // Limpa o formulário e oculta a seção de edição
-      editarFormSection.style.display = "none";
-      eventoEditandoId = null;
-      await carregarEventos();
-    } catch (error) {
-      console.error("Erro ao editar evento: ", error);
-    }
-  } else {
-    alert("Senha incorreta!");
+    // Preenche o formulário com os dados do evento
+    document.getElementById("nome").value = evento.nome;
+    document.getElementById("data").value = evento.data;
+    document.getElementById("local").value = evento.local;
+    document.getElementById("descricao").value = evento.descricao;
+    eventoIdEdicao = id;  // Armazena o ID do evento que está sendo editado
   }
 });
 
