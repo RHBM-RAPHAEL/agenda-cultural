@@ -1,4 +1,5 @@
 // Importando os módulos do Firebase via ES Modules
+import { deleteDoc, doc } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
 import {
   getFirestore,
@@ -51,22 +52,24 @@ async function carregarEventos() {
   await excluirEventosPassados(); // Exclui eventos vencidos antes de carregar
 
   const querySnapshot = await getDocs(collection(db, "eventos"));
-  querySnapshot.forEach((doc) => {
-    const evento = doc.data();
+  querySnapshot.forEach((documento) => {
+  const evento = documento.data();
+  const id = documento.id;
 
-    const div = document.createElement("div");
-    div.className = "evento";
+  const div = document.createElement("div");
+  div.className = "evento";
 
-    div.innerHTML = `
-      <h3>${evento.nome}</h3>
-      <p><strong>Data:</strong> ${new Date(evento.data).toLocaleString()}</p>
-      <p><strong>Local:</strong> ${evento.local}</p>
-      <p>${evento.descricao}</p>
-      <hr>
-    `;
+  div.innerHTML = `
+    <h3>${evento.nome}</h3>
+    <p><strong>Data:</strong> ${new Date(evento.data).toLocaleString()}</p>
+    <p><strong>Local:</strong> ${evento.local}</p>
+    <p>${evento.descricao}</p>
+    <button class="btn-excluir" data-id="${id}">Excluir</button>
+    <hr>
+  `;
 
-    listaEventos.appendChild(div);
-  });
+  listaEventos.appendChild(div);
+});
 }
 
 // Quando o formulário for enviado, salva no Firebase
