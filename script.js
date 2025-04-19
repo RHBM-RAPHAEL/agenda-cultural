@@ -1,5 +1,4 @@
 // Importando os módulos do Firebase via ES Modules
-import { deleteDoc, doc } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
 import {
   getFirestore,
@@ -29,47 +28,47 @@ const db = getFirestore(app);
 const eventoForm = document.getElementById("evento-form");
 const listaEventos = document.getElementById("lista-eventos");
 
-// 🧽 Nova função para excluir eventos vencidos do Firestore
-async function excluirEventosPassados() {
-  const agora = new Date();
-  const querySnapshot = await getDocs(collection(db, "eventos"));
-
-  querySnapshot.forEach(async (documento) => {
-    const dados = documento.data();
-    const dataEvento = new Date(dados.data);
-
-    if (dataEvento <= agora) {
-      await deleteDoc(doc(db, "eventos", documento.id));
-      console.log(`Evento "${dados.nome}" excluído (prazo expirado).`);
-    }
-  });
-}
-
 // Função para carregar eventos do Firestore
 async function carregarEventos() {
   listaEventos.innerHTML = ""; // Limpa antes de carregar
 
-  await excluirEventosPassados(); // Exclui eventos vencidos antes de carregar
-
   const querySnapshot = await getDocs(collection(db, "eventos"));
   querySnapshot.forEach((documento) => {
-  const evento = documento.data();
-  const id = documento.id;
+    const evento = documento.data();
+    const id = documento.id;
 
-  const div = document.createElement("div");
-  div.className = "evento";
+    const dataEvento = new Date(evento.data);
+    const agora = new Date();
 
-  div.innerHTML = `
-    <h3>${evento.nome}</h3>
-    <p><strong>Data:</strong> ${new Date(evento.data).toLocaleString()}</p>
-    <p><strong>Local:</strong> ${evento.local}</p>
-    <p>${evento.descricao}</p>
-    <button class="btn-excluir" data-id="${id}">Excluir</button>
-    <hr>
-  `;
+    // Ignorar eventos que já passaram
+    if (dataEvento < agora) {
+      return;
+    }
 
-  listaEventos.appendChild(div);
-});
+    const div = document.createElement("div");
+    div.className = "evento";
+
+    div.innerHTML = `
+      <h3>${evento.nome}</h3>
+      <p><strong>Data:</strong> ${dataEvento.toLocaleString()}</p>
+      <p><strong>Local:</strong> ${evento.local}</p>
+      <p>${evento.descricao}</p>
+      <button class="btn-excluir" data-id="${id}">Excluir</button>
+      <hr>
+    `;
+
+    listaEventos.appendChild(div);
+
+    // Botão de exclusão
+    const botaoExcluir = div.querySelector(".btn-excluir");
+    botaoExcluir.addEventListener("click", async () => {
+      const confirmacao = confirm("Tem certeza que deseja excluir este evento?");
+      if (confirmacao) {
+        await deleteDoc(doc(db, "eventos", id));
+        carregarEventos(); // Recarrega após deletar
+      }
+    });
+  });
 }
 
 // Quando o formulário for enviado, salva no Firebase
@@ -84,13 +83,13 @@ eventoForm.addEventListener("submit", async (e) => {
   try {
     await addDoc(collection(db, "eventos"), {
       nome,
-      data: new Date(data),
+      data,
       local,
       descricao
     });
 
-    eventoForm.reset(); // Limpa os campos
-    carregarEventos(); // Recarrega os eventos atualizados
+    eventoForm.reset();
+    carregarEventos();
 
   } catch (error) {
     console.error("Erro ao adicionar evento: ", error);
