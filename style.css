@@ -38,8 +38,25 @@ input, textarea {
   font-size: 1rem;
 }
 
-/* Botão Padrão (usado para estilos gerais, se necessário) */
-button {
+/* Botão: Mostrar Eventos */
+#mostrar-eventos-btn {
+  background-color: #ff9800;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  margin-bottom: 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+#mostrar-eventos-btn:hover {
+  background-color: #e68900;
+}
+
+/* Botão: Salvar Evento */
+.btn-salvar {
+  background-color: #3949ab;
+  color: white;
   padding: 0.7rem 1.5rem;
   border: none;
   border-radius: 6px;
@@ -47,40 +64,24 @@ button {
   font-weight: bold;
   transition: background-color 0.3s;
 }
-
-/* Botão Mostrar Eventos (laranja) */
-#mostrar-eventos-btn {
-  background-color: #ff9800;
-  color: white;
-  padding: 10px 15px;
-  margin-bottom: 15px;
-  border-radius: 5px;
-  font-size: 16px;
-}
-
-#mostrar-eventos-btn:hover {
-  background-color: #fb8c00;
-}
-
-/* Botão Salvar (verde) */
-.btn-salvar {
-  background-color: #28a745;
-  color: white;
-}
-
 .btn-salvar:hover {
-  background-color: #218838;
+  background-color: #303f9f;
 }
 
-/* Botão Excluir (vermelho) */
+/* Botão: Excluir Evento */
 .btn-excluir {
-  background-color: #dc3545;
+  background-color: #e53935;
   color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s;
   margin-left: 10px;
 }
-
 .btn-excluir:hover {
-  background-color: #c82333;
+  background-color: #c62828;
 }
 
 .evento {
