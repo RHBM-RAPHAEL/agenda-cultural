@@ -8,7 +8,7 @@ import {
   doc
 } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
 
-// Config Firebase
+// Configuração do Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyDHGwiT-bxFTKSa1LUJ6c0icxg1Ss_kyOY",
   authDomain: "agenda-ccb-c82a6.firebaseapp.com",
@@ -24,20 +24,22 @@ const db = getFirestore(app);
 const eventoForm = document.getElementById("evento-form");
 const listaEventos = document.getElementById("lista-eventos");
 
+// Função para carregar eventos
 async function carregarEventos() {
   listaEventos.innerHTML = "";
   const querySnapshot = await getDocs(collection(db, "eventos"));
 
   const agora = new Date();
 
-  querySnapshot.forEach(async (documento) => {
+  // Usando for...of para garantir execução correta das promessas
+  for (const documento of querySnapshot.docs) {
     const evento = documento.data();
     const eventoData = new Date(evento.data);
 
     // Deleta eventos passados
     if (eventoData < agora) {
       await deleteDoc(doc(db, "eventos", documento.id));
-      return;
+      continue; // Se o evento foi deletado, passa para o próximo
     }
 
     // Mostra eventos futuros
@@ -53,7 +55,7 @@ async function carregarEventos() {
     `;
 
     listaEventos.appendChild(div);
-  });
+  }
 }
 
 // Adicionar evento
@@ -86,12 +88,17 @@ listaEventos.addEventListener("click", async (e) => {
     const id = e.target.getAttribute("data-id");
 
     try {
+      // Exclui o evento do Firestore
       await deleteDoc(doc(db, "eventos", id));
-      carregarEventos();
+
+      // Remove o evento da interface sem recarregar todos
+      const eventoDiv = e.target.closest(".evento");
+      eventoDiv.remove();
     } catch (error) {
       console.error("Erro ao excluir evento: ", error);
     }
   }
 });
 
+// Carregar eventos ao inicializar a página
 carregarEventos();
