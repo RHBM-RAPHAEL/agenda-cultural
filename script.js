@@ -23,15 +23,14 @@ const db = getFirestore(app);
 
 const eventoForm = document.getElementById("evento-form");
 const listaEventos = document.getElementById("lista-eventos");
+const mostrarEventosBtn = document.getElementById("mostrar-eventos-btn");
 
 // Função para carregar eventos
 async function carregarEventos() {
   listaEventos.innerHTML = "";
   const querySnapshot = await getDocs(collection(db, "eventos"));
-
   const agora = new Date();
 
-  // Usando for...of para garantir execução correta das promessas
   for (const documento of querySnapshot.docs) {
     const evento = documento.data();
     const eventoData = new Date(evento.data);
@@ -39,7 +38,7 @@ async function carregarEventos() {
     // Deleta eventos passados
     if (eventoData < agora) {
       await deleteDoc(doc(db, "eventos", documento.id));
-      continue; // Se o evento foi deletado, passa para o próximo
+      continue;
     }
 
     // Mostra eventos futuros
@@ -76,7 +75,9 @@ eventoForm.addEventListener("submit", async (e) => {
     });
 
     eventoForm.reset();
-    carregarEventos();
+    await carregarEventos();
+    listaEventos.style.display = "block";
+    mostrarEventosBtn.textContent = "Ocultar Eventos";
   } catch (error) {
     console.error("Erro ao adicionar evento: ", error);
   }
@@ -88,10 +89,7 @@ listaEventos.addEventListener("click", async (e) => {
     const id = e.target.getAttribute("data-id");
 
     try {
-      // Exclui o evento do Firestore
       await deleteDoc(doc(db, "eventos", id));
-
-      // Remove o evento da interface sem recarregar todos
       const eventoDiv = e.target.closest(".evento");
       eventoDiv.remove();
     } catch (error) {
@@ -99,22 +97,15 @@ listaEventos.addEventListener("click", async (e) => {
     }
   }
 });
-// Carregar eventos ao inicializar a página
-carregarEventos();
-const mostrarEventosBtn = document.getElementById("mostrar-eventos-btn");
-const listaEventosDiv = document.getElementById("lista-eventos");
 
+// Mostrar/Ocultar eventos
 mostrarEventosBtn.addEventListener("click", async () => {
-  // Se já estiver visível, oculta
-  if (listaEventosDiv.style.display === "block") {
-    listaEventosDiv.style.display = "none";
+  if (listaEventos.style.display === "block") {
+    listaEventos.style.display = "none";
     mostrarEventosBtn.textContent = "Mostrar Eventos";
   } else {
-    listaEventosDiv.style.display = "block";
+    listaEventos.style.display = "block";
     mostrarEventosBtn.textContent = "Ocultar Eventos";
-    // Carrega os eventos só quando mostrar
-    if (listaEventosDiv.innerHTML.trim() === "") {
-      await carregarEventos();
-    }
+    await carregarEventos();
   }
 });
