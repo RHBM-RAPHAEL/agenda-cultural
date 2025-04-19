@@ -99,19 +99,5 @@ listaEventos.addEventListener("click", async (e) => {
     }
   }
 });
-// Octokit.js
-// https://github.com/octokit/core.js#readme
-const octokit = new Octokit({
-  auth: 'YOUR-TOKEN'
-})
-
-await octokit.request('POST /repos/{owner}/{repo}/pages/deployments/{pages_deployment_id}/cancel', {
-  owner: 'OWNER',
-  repo: 'REPO',
-  pages_deployment_id: 'PAGES_DEPLOYMENT_ID',
-  headers: {
-    'X-GitHub-Api-Version': '2022-11-28'
-  }
-})
 // Carregar eventos ao inicializar a página
 carregarEventos();
