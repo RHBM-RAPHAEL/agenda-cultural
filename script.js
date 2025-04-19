@@ -21,43 +21,40 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+// Elementos
 const eventoForm = document.getElementById("evento-form");
 const listaEventos = document.getElementById("lista-eventos");
 const mostrarEventosBtn = document.getElementById("mostrar-eventos-btn");
 
-// Função para carregar eventos
+// Carregar eventos
 async function carregarEventos() {
   listaEventos.innerHTML = "";
   const querySnapshot = await getDocs(collection(db, "eventos"));
   const agora = new Date();
 
-  for (const documento of querySnapshot.docs) {
+  querySnapshot.forEach(async (documento) => {
     const evento = documento.data();
-    const eventoData = new Date(evento.data);
+    const dataEvento = new Date(evento.data);
 
-    // Deleta eventos passados
-    if (eventoData < agora) {
+    if (dataEvento < agora) {
       await deleteDoc(doc(db, "eventos", documento.id));
-      continue;
+      return;
     }
 
-    // Mostra eventos futuros
     const div = document.createElement("div");
     div.className = "evento";
-
     div.innerHTML = `
       <h3>${evento.nome}</h3>
-      <p><strong>Data:</strong> ${eventoData.toLocaleString()}</p>
+      <p><strong>Data:</strong> ${dataEvento.toLocaleString()}</p>
       <p><strong>Local:</strong> ${evento.local}</p>
       <p>${evento.descricao}</p>
       <button class="btn-excluir" data-id="${documento.id}">Excluir</button>
     `;
-
     listaEventos.appendChild(div);
-  }
+  });
 }
 
-// Adicionar evento
+// Adicionar novo evento
 eventoForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -67,45 +64,39 @@ eventoForm.addEventListener("submit", async (e) => {
   const descricao = document.getElementById("descricao").value;
 
   try {
-    await addDoc(collection(db, "eventos"), {
-      nome,
-      data,
-      local,
-      descricao
-    });
-
+    await addDoc(collection(db, "eventos"), { nome, data, local, descricao });
     eventoForm.reset();
     await carregarEventos();
     listaEventos.style.display = "block";
     mostrarEventosBtn.textContent = "Ocultar Eventos";
+    mostrarEventosBtn.style.backgroundColor = "#28a745"; // verde
   } catch (error) {
     console.error("Erro ao adicionar evento: ", error);
   }
 });
 
-// Exclusão manual
+// Remover evento
 listaEventos.addEventListener("click", async (e) => {
   if (e.target.classList.contains("btn-excluir")) {
     const id = e.target.getAttribute("data-id");
-
     try {
       await deleteDoc(doc(db, "eventos", id));
-      const eventoDiv = e.target.closest(".evento");
-      eventoDiv.remove();
+      e.target.closest(".evento").remove();
     } catch (error) {
-      console.error("Erro ao excluir evento: ", error);
+      console.error("Erro ao excluir evento:", error);
     }
   }
 });
 
 // Mostrar/Ocultar eventos
 mostrarEventosBtn.addEventListener("click", async () => {
-  if (listaEventos.style.display === "block") {
-    listaEventos.style.display = "none";
-    mostrarEventosBtn.textContent = "Mostrar Eventos";
-  } else {
-    listaEventos.style.display = "block";
-    mostrarEventosBtn.textContent = "Ocultar Eventos";
+  const visivel = listaEventos.style.display === "block";
+
+  listaEventos.style.display = visivel ? "none" : "block";
+  mostrarEventosBtn.textContent = visivel ? "Mostrar Eventos" : "Ocultar Eventos";
+  mostrarEventosBtn.style.backgroundColor = visivel ? "#007bff" : "#28a745"; // azul ou verde
+
+  if (!visivel) {
     await carregarEventos();
   }
 });
